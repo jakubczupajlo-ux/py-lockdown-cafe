@@ -17,7 +17,6 @@ class Cafe:
 
         expiration_date = visitor["vaccine"]["expiration_date"]
         if expiration_date < datetime.date.today():
-            # Przekazujemy datę ważności zgodnie z wymaganiem mentora
             raise OutdatedVaccineError(expiration_date)
 
         if not visitor.get("wearing_a_mask", False):
