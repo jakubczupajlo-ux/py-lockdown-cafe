@@ -1,17 +1,31 @@
 from app.cafe import Cafe
-from app.errors import VaccineError, NotWearingMaskError
+from app.errors import (
+    VaccineError,
+    NotWearingMaskError,
+)
 
 
 def go_to_cafe(friends: list[dict], cafe: Cafe) -> str:
+    # KROK 1: Sprawdzamy tylko szczepienia u wszystkich
+    # Jeśli ktokolwiek ma problem z vaccine, zwracamy ogólny komunikat
     try:
         for friend in friends:
-            cafe.visit_cafe(friend)
+            try:
+                cafe.visit_cafe(friend)
+            except NotWearingMaskError:
+                # Ignorujemy maski w pierwszym przebiegu, 
+                # interesują nas tylko błędy VaccineError
+                continue
     except VaccineError:
         return "All friends should be vaccinated"
-    except NotWearingMaskError:
-        masks_to_buy = sum(
-            1 for f in friends if not f.get("wearing_a_mask", False)
-        )
+
+    # KROK 2: Jeśli wszyscy są zaszczepieni, liczymy maski
+    masks_to_buy = 0
+    for friend in friends:
+        if not friend.get("wearing_a_mask", False):
+            masks_to_buy += 1
+
+    if masks_to_buy > 0:
         return f"Friends should buy {masks_to_buy} masks"
 
     return f"Friends can go to {cafe.name}"
